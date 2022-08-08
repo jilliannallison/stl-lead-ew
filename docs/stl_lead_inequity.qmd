@@ -1,0 +1,58 @@
+---
+title: "stl_lead_inequity"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(dplyr)
+library(here)
+```
+
+Read in stl lead csv
+
+```{r}
+stl_lead <- read_csv(here::here("data", "stl_blood_lead.csv")) %>%
+  clean_names()
+```
+
+### Add proportion white to new data frame
+
+```{r}
+stl_lead_prop <- mutate(stl_lead, prop_white = (white / total_pop) * 100)
+```
+
+### Create a scatterplot
+
+```{r}
+stl_lead_plot <- ggplot(data = stl_lead_prop,
+       aes(x = prop_white, y = pct_elevated)) +
+  geom_point(size = 2, alpha = 0.5, color = "blue") +
+  labs(x = "Percent White", y = "Elevated Blood Lead Levels") +
+  xlim(0, 100) +
+  ylim(0, 30)
+stl_lead_plot
+```
+As the proportion of white people per census tract increases, the percent of elevated blood lead levels decreases.
+
+```{r}
+ggsave(plot = stl_lead_plot, here("figs", "slt_lead_plot.jpg"),
+       width = 5,
+       height = 6)
+```
+
+### Create a histogram
+
+```{r}
+my_histogram <- ggplot(data = stl_lead_prop, aes(x = pct_elevated)) +
+  geom_histogram(color = "green", fill = "purple")+
+  labs(x = "Percent of Elevated Blood Levels", y = "Frequency")
+my_histogram
+```
+
+```{r}
+ggsave(plot = my_histogram, here("figs", "my_histogram.jpg"))
+```
+
